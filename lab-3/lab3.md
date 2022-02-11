@@ -9,3 +9,7 @@ Open a database schema file called schema.sql inside your cats_app directory:
 ```
 nano schema.sql
 ```
+
+In this schema file, you first delete the cats table if it already exists. This avoids the possibility of another table named cats existing, which might result in confusing behavior (for example, if it has different columns).
+
+We use `CREATE TABLE` posts to create the `cats` table with the following columns:
