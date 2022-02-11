@@ -16,7 +16,7 @@ Topics we covered:
 Topics we covered:
     1. Classes and Objects in Python
     2. Setting up Flask, GitHub and VS Code
-    3. Creating your first server
+    3. Creating our first server
 
 ## Lab 3 - Deep dive into APIs and POSTMAN, Connecting SQL with Flask and customizing endpoints
 
