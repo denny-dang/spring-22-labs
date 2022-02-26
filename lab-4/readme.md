@@ -95,6 +95,7 @@ This endpoint functions in exactly the same way as the earlier one. We just use 
 ### Getting data from file uploads
 
 **Route: "/file"**
+
 In the above two endpoints, we used arguments or form data to get information. However, file uploads is another really popular way to get information at the Front-End. We should also know how to process the uploaded files and also to store them.
 
 In this lab, we will look into processing uploaded files. You can look at this [code](https://flask.palletsprojects.com/en/2.0.x/patterns/fileuploads/) to understand file storage using Flask.
