@@ -28,3 +28,10 @@ Topics we covered:
         4a. POST endpoint - Insert data into the SQL db
         4b. GET endpoint - Get all data from the SQL db
         4c. GET BY ID endpoint - Get data based on a particular ID from the DB
+
+## Lab 4 - Understanding the various methods to get data using API requests
+
+Topics we covered:
+    1. Get data using URL args/params
+    2. Get data using form input
+    3. Get data using file uploads
