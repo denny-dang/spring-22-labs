@@ -1,8 +1,3 @@
-This is the main code used in today's lab.
-You can use this as a starting point for Assignment 1.
-
-Code comments and documentation will be updated soon. Uploading this early for people to start with.
-
 # Lab 5 - Deep dive into Docker and Docker Compose
 
 In today's lab, we deep-dive into Docker and Docker Compose.
