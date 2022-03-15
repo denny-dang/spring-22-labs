@@ -35,3 +35,12 @@ Topics we covered:
     1. Get data using URL args/params
     2. Get data using form input
     3. Get data using file uploads
+
+## Lab 5 - We dive deeper into Docker and Docker Compose
+
+Topics we covered:
+    1. VMs v Containers
+    2. Creating a Dockerfile for our Docker Image
+    3. Running multiple docker containers
+    4. Enabling the containers to talk to each other
+    5. Using the containers with POSTMAN
