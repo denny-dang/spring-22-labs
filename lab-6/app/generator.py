@@ -9,6 +9,7 @@ import sys
 
 r = Redis(host='redis', port=6379, decode_responses=True)
 queue = Queue(connection=r)
+
 app = Flask(__name__)
 
 @app.route('/start')
@@ -25,10 +26,11 @@ def start():
             "timeOfEnqueue": job.enqueued_at,
             "message": f"{msg} with id: {job.id} added to queue at {job.enqueued_at}"
         }
+        i += 1
         print(response)
 
-    
-
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
 
 
 
