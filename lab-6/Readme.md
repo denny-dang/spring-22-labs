@@ -29,6 +29,7 @@ There are three main reasons:
 <li><b>Reliability</b>: We don’t live in a world of 100% uptime, services do go down, and when they do it’s important that our users aren’t the ones that suffer. If we were to make our API calls directly in the users requests we wouldn’t have any good options in the event of a failure. We could retry the call right away in the hope that it was just a momentary glitch, but more than likely we’ll either have to show the user an error, or silently discard whatever we were trying to do. Queues neatly get around this problem since they can happily continue retrying over and over in the background, and all the while our users never need to know anything is wrong.</li>
 </br>
 <li><b>Scalability</b>. If we had a surge in requests that involved something CPU intensive like resizing images, we might have a problem if all of our apps were responsible for this. Not only would the increased CPU load slow down other image resize requests, it could very well slow down requests across the entire site. What we need to do is isolate this workload from the user’s experience, so that it doesn’t matter if it happens quickly or slowly. This is where queues shine. Even if our queues become overloaded, the rest of the site will remain responsive.</li>
+</ol>
 
 ## What is under the hood?
 Queue mechanisms use something called `workers` that run in the background and take care of execution of each process in parallel. 
@@ -123,6 +124,9 @@ redis
 The `requirements.txt` file for generator include flask, rq and redis as we need all of these in our `generator.py` file.
 
 ##### Dockerfile
+```
+
+```
 
 
 
