@@ -49,6 +49,5 @@ Topics we covered:
 
 Topics we covered:
     1. Why do we need Async Queues?
-    2. How do Async Queues Work (High level brief)
-    3. Creating our Producer and Consumer
-    4. Running the Queue using Docker
+    2. What is under the hood? (High level brief)
+    3. Creating a Flask application that uses a Queue and runs it using Docker
