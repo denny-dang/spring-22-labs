@@ -110,8 +110,7 @@ Our worker function - `save_to_file` is very basic and just prints the message i
 However, you can think of how we can use MySQL here to store data and bring in our learnings from previous labs and Assignment 1.
 
 ### Deploying via Docker
-Like lab-5, we divide our working directory into two folders - `generator` and `worker` where each folder is in accordance with the coontainer that we will be running using Docker.
-Both of these will have their seperate `requirements.txt` file and `Dockerfile`.
+We create a folder called `app` that stores both our Python files. We also have our `requirements.txt` file and `Dockerfile`.
 
 #### Docker setup for Generator
 
@@ -121,13 +120,21 @@ flask
 rq
 redis
 ```
-The `requirements.txt` file for generator include flask, rq and redis as we need all of these in our `generator.py` file.
+The `requirements.txt` file for generator include flask, rq and redis as we need all of these in our `generator.py` file and for our Redis server.
 
 ##### Dockerfile
 ```
-
+FROM python:3.7-alpine
+COPY . /app
+WORKDIR /app
+RUN pip install -r requirements.txt
+EXPOSE 5000
+CMD python generator.py
 ```
+For `rq` and `redis`, we can use pre-build docker images to run them using docker-compose.
 
+### Docker Compose File
+Pending
 
 
 
