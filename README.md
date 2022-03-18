@@ -44,3 +44,11 @@ Topics we covered:
     3. Running multiple docker containers
     4. Enabling the containers to talk to each other
     5. Using the containers with POSTMAN
+
+## Lab 6 - Asynchronous Task Queues
+
+Topics we covered:
+    1. Why do we need Async Queues?
+    2. How do Async Queues Work (High level brief)
+    3. Creating our Producer and Consumer
+    4. Running the Queue using Docker
