@@ -25,7 +25,7 @@ The waiter/waitress in this case is an Async Queue while you and all the other g
 There are three main reasons:
 <ol>
 <li> Speed: When we’re talking to a third party API we have to face reality; unless that third party is physically located next to our infrastructure, there’s going to be latency involved. All it would take is the addition of a few API calls and we could easily end up doubling or tripling our response time, leading to a sluggish site and unhappy users. However if we push these API calls into our queue instead, we can return a response to our users immediately while our queues take as long as they like to talk to the API.</li>
-
+</br>
 <li>Reliability: We don’t live in a world of 100% uptime, services do go down, and when they do it’s important that our users aren’t the ones that suffer. If we were to make our API calls directly in the users requests we wouldn’t have any good options in the event of a failure. We could retry the call right away in the hope that it was just a momentary glitch, but more than likely we’ll either have to show the user an error, or silently discard whatever we were trying to do. Queues neatly get around this problem since they can happily continue retrying over and over in the background, and all the while our users never need to know anything is wrong.</li>
-
+</br>
 <li>Scalability. If we had a surge in requests that involved something CPU intensive like resizing images, we might have a problem if all of our apps were responsible for this. Not only would the increased CPU load slow down other image resize requests, it could very well slow down requests across the entire site. What we need to do is isolate this workload from the user’s experience, so that it doesn’t matter if it happens quickly or slowly. This is where queues shine. Even if our queues become overloaded, the rest of the site will remain responsive.</li>
