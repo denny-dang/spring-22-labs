@@ -1,9 +1,8 @@
 version: "2"
 services:
   generator:
-    build: ./app
-    command: python generator.py
-    container_name: "app"
+    build: ./generator
+    container_name: "generator"
     ports:
       - "8000:5000"
   
@@ -14,9 +13,9 @@ services:
     expose:
       - '6379'
   
-  rq-worker:
-    image: jaredv/rq-docker
-    container_name: rq-worker
+  worker:
+    build: ./worker
+    container_name: worker
     command: rq worker --with-scheduler -u "redis://redis:6379"
     deploy:
       replicas: 1

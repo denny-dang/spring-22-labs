@@ -64,16 +64,17 @@ import json
 import time
 from redis import Redis
 from rq import Queue
+import random
 from worker import save_to_file
 ```
 We first import `Redis` and `Queue`. We also import `save_to_file` function from our other file, i.e. `worker.py`.
 We are importing `time` to simulate some delay.
 
 ```
-r = Redis(host='some-redis')
+r = Redis(host='redis', port=6379, decode_responses=True)
 queue = Queue(connection=r)
 ```
-We now set up our own queue. We intiate a Redis instance running on `some-redis` as then host name.
+We now set up our own queue. We intiate a Redis instance running on `redis` as then host name.
 We then create a queue and set the connection to be Redis instance that we just set up.
 
 ```
@@ -81,21 +82,21 @@ app = Flask(__name__)
 
 @app.route('/start')
 def start():
-    i = 1
-    while True:
-        time.sleep(.5)
-        msg = f"generator-{i}"
-        print(msg)
-        job = queue.enqueue(save_to_file, 'msg')
-        response = {
+    
+    delayTime = random.randint(1,10)
+    time.sleep(delayTime)
+    msg = f"generating task with delay: {delayTime}"
+    print(msg)
+    job = queue.enqueue(save_to_file, msg)
+    response = {
             "jobId": job.id,
             "timeOfEnqueue": job.enqueued_at,
             "message": f"{msg} with id: {job.id} added to queue at {job.enqueued_at}"
         }
-        return response, 200
+    print(response) 
 ```
-We create a Flask app and then set up a GET endpoint called `/start`. This function uses the sleep function to simulate a delay for 0.5 seconds.
-After the sleep, we just create a message `generator-{i}` where i is the count of the request sent.
+We create a Flask app and then set up a GET endpoint called `/start`. This function uses the sleep function to simulate a random delay.
+After the sleep, we just create a message `generating task with delay: {delayTime}` where delayTime is the random delay time.
 
 `q.enqueue(function_name, args)` is used to add a task to the Queue. The `function_name` is the function that the broker will call to take care of this task -> this is essentially your worker. In our case, the worker function is `save_to_file` that we import from `worker.py`. `args` are the parameters that need to be passed to the worker function. In the above case, we pass `msg` as argument for `save_to_file`.
 
@@ -110,7 +111,12 @@ Our worker function - `save_to_file` is very basic and just prints the message i
 However, you can think of how we can use MySQL here to store data and bring in our learnings from previous labs and Assignment 1.
 
 ### Deploying via Docker
-We create a folder called `app` that stores both our Python files. We also have our `requirements.txt` file and `Dockerfile`.
+We will have two containers - One for our generator Flask webapp and other for the RQ Worker
+We create a folder called `generator` that stores both our Python files. We also have our `requirements.txt` file and `Dockerfile`.
+We also have a folder called `worker` which stores the `worker.py` file, its own Dockerfile and a requirements.txt file.
+
+We have the `worker.py` file in both the folders. That is so because in the generator folder, it functions as a module we are importing into our webapp. In the worker folder, it is the base file that we will be running in the worker container for the queue worker to run.
+Since both the containers will be running seperately, we can't use the worker file in any one folder to be used in the other.
 
 #### Docker setup for Generator
 
@@ -120,7 +126,7 @@ flask
 rq
 redis
 ```
-The `requirements.txt` file for generator include flask, rq and redis as we need all of these in our `generator.py` file and for our Redis server.
+The `requirements.txt` file for generator include flask, rq and redis as we need all of these in our `generator.py` file to connect and use our Redis server.
 
 ##### Dockerfile
 ```
@@ -129,12 +135,65 @@ COPY . /app
 WORKDIR /app
 RUN pip install -r requirements.txt
 EXPOSE 5000
-CMD python generator.py
+
+CMD ["python", "generator.py"]
 ```
-For `rq` and `redis`, we can use pre-build docker images to run them using docker-compose.
+The commands here are similar to what we did for lab-5.
+
+#### Docker setup for Worker
+
+##### requirements.txt
+```
+rq
+redis
+```
+The `requirements.txt` file for worker include rq and redis as we need these to host and run the worker queue.
+
+##### Dockerfile
+```
+FROM python:3.7-alpine
+COPY . /app
+WORKDIR /app
+RUN pip install -r requirements.txt
+EXPOSE 5000
+```
+The commands here are similar to what we did for lab-5 and for generator. Notice that we don't have a CMD here. That is because we will be running that using our `docker-compose`
 
 ### Docker Compose File
-Pending
+```
+version: "2"
+services:
+  generator:
+    build: ./generator
+    container_name: "generator"
+    ports:
+      - "8000:5000"
+  
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    expose:
+      - '6379'
+  
+  worker:
+    build: ./worker
+    container_name: worker
+    command: rq worker --with-scheduler -u "redis://redis:6379"
+    deploy:
+      replicas: 1
+    depends_on:
+      - redis
+```
+We create 3 containers, two of them have Python base images -> One for worker and one for generator. 
+The worker container runs and hosts the rq workers while the generator hosts the webapp.
+The other one is a container for redis that we deploy using a prebuild image of redis.
+
+For the worker container, we use `rq worker --with-scheduler -u "redis://redis:6379"` to initialize the rq workers and tell them the hostname to connect and run. This should be the same that we used in our generator file while initializing redis.
+
+### Running it all
+One command is all it takes!
+`docker-compose up`
 
 
 
