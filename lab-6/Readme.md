@@ -59,19 +59,22 @@ The Worker file executes those tasks asynchronously.
 
 #### generator.py
 ```
+from crypt import methods
+import unicodedata
 from flask import Flask, request
-import json
 import time
 from redis import Redis
 from rq import Queue
-import random
+from rq.job import Job
 from worker import save_to_file
+import random
+from rq.registry import StartedJobRegistry
 ```
 We first import `Redis` and `Queue`. We also import `save_to_file` function from our other file, i.e. `worker.py`.
 We are importing `time` to simulate some delay.
 
 ```
-r = Redis(host='redis', port=6379, decode_responses=True)
+r = Redis(host='redis', port=6379)
 queue = Queue(connection=r)
 ```
 We now set up our own queue. We intiate a Redis instance running on `redis` as then host name.
@@ -83,31 +86,53 @@ app = Flask(__name__)
 @app.route('/start')
 def start():
     
-    delayTime = random.randint(1,10)
-    time.sleep(delayTime)
+    delayTime = random.randint(20,30)
     msg = f"generating task with delay: {delayTime}"
-    print(msg)
-    job = queue.enqueue(save_to_file, msg)
+    job = queue.enqueue(save_to_file, msg, delayTime)
     response = {
             "jobId": job.id,
             "timeOfEnqueue": job.enqueued_at,
             "message": f"{msg} with id: {job.id} added to queue at {job.enqueued_at}"
         }
-    print(response) 
+    return response 
 ```
-We create a Flask app and then set up a GET endpoint called `/start`. This function uses the sleep function to simulate a random delay.
-After the sleep, we just create a message `generating task with delay: {delayTime}` where delayTime is the random delay time.
+We create a Flask app and then set up a GET endpoint called `/start`.
+We just create a message `generating task with delay: {delayTime}` where delayTime is the random delay time.
 
-`q.enqueue(function_name, args)` is used to add a task to the Queue. The `function_name` is the function that the broker will call to take care of this task -> this is essentially your worker. In our case, the worker function is `save_to_file` that we import from `worker.py`. `args` are the parameters that need to be passed to the worker function. In the above case, we pass `msg` as argument for `save_to_file`.
+`q.enqueue(function_name, args)` is used to add a task to the Queue. The `function_name` is the function that the broker will call to take care of this task -> this is essentially your worker. In our case, the worker function is `save_to_file` that we import from `worker.py`. `args` are the parameters that need to be passed to the worker function. In the above case, we pass `msg` and `delayTime` as argument for `save_to_file`.
 
 `job.id` and `dob.enqueued_at` are inbuild parameters that are a part of the `enqueue` function. The first one gives the unique id created for that task and the second one gives the time at which the task was queued.
 
+```
+@app.route('/list')
+def getList():
+    registry = StartedJobRegistry('default', connection=r)
+    running_job_ids = registry.get_job_ids()  # Jobs which are exactly running. 
+    return {"jobs": running_job_ids}
+```
+We create a GET route called `list` which returns a list of all job ids that are currently running. This can allow you to view all the queues tasks and their ids in the workers.
+We use a RQ registry here - `StartedJobRegistry` which connects to our redis connection. We then use the `get_job_ids()` function to get a list of all ids currently running.
+We then return a list of all ids.
+
+
+```
+@app.route('/status/<id>')
+def getStatus(id):
+    job = Job.fetch(id, connection=r)
+    return {"result": job.result}
+```
+We return a GET route called `status` which returns the result of a completed job. It takes in the `job id` as part of the URL and we use the `Job.fetch()` function that takes in the job id and the redis connection to fetch a job.
+We then resturn the result of the job.
+
 #### worker.py
 ```
-def save_to_file(msg):
-    print("Processed message {msg}")
+import time
+
+def save_to_file(msg, delayTime):
+    time.sleep(delayTime)
+    return f"Processed message {msg} after {delayTime} seconds"
 ```
-Our worker function - `save_to_file` is very basic and just prints the message in this case.
+Our worker function - `save_to_file` is very basic and returns a message after waiting for a certain delay (passed from the generator).
 However, you can think of how we can use MySQL here to store data and bring in our learnings from previous labs and Assignment 1.
 
 ### Deploying via Docker
