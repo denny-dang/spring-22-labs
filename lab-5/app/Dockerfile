@@ -1,11 +1,10 @@
-FROM python:3.8
+FROM python:3.7-alpine
 
 EXPOSE 5000
+COPY . /app
 
 WORKDIR /app
 
-COPY requirements.txt /app
-RUN pip install -r requirements.txt
+RUN pip3 install -r requirements.txt
 
-COPY app.py /app
-CMD python app.py
+CMD python3 ./app.py
