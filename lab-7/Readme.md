@@ -85,7 +85,7 @@ return {"id": str(task["_id"]),
     "status": task["status"]}, 200
 ```
 
-### Updating in MongoDB
+## Updating in MongoDB
 Like the READ method, UPDATE is also fairly simple in MongoDB as compared to MySQL and relies on the properties (keys) of an object.
 We use a `filter` which tells the database which records to look into. This is basically the equivalent to our `WHERE` keyword in MySQL.
 
@@ -109,7 +109,7 @@ return {}, 200
 We then use `update_one` which takes in the filter and the `newRecord` which is nothing but our `updatedRecord` tied in with the `"$set"` keyword which tells the database to replace or `set` the updatedRecord in place of the filtered record.
 <i>This updates the first record that matches our filter specs.</i>
 
-### Deleting in MongoDB
+## Deleting in MongoDB
 We can delete a record using the `filter` that we have used for GetByID and UPDATE methods above.
 
 ```
