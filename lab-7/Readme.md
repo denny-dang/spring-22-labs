@@ -75,5 +75,46 @@ To query a record based on a certain parameter or condition, we can directly emb
 ```
 task = col.find_one({"title": title})
 ```
-Here, we are filtering our results based on the `title`. Please note that the filters you provide are keys within your objects in the collection.
 
+Here, we are filtering our results based on the `title`. Please note that the filters you provide are keys within your objects in the collection.
+Now we can process this task to make it readable and return it.
+
+```
+return {"id": str(task["_id"]),
+    "title": task["title"],
+    "status": task["status"]}, 200
+```
+
+### Updating in MongoDB
+Like the READ method, UPDATE is also fairly simple in MongoDB as compared to MySQL and relies on the properties (keys) of an object.
+We use a `filter` which tells the database which records to look into. This is basically the equivalent to our `WHERE` keyword in MySQL.
+
+```
+filter = {"title": title}
+updatedRecord = {}
+newParams = request.get_json()
+if newParams['title'] is not None:
+    updatedRecord['title'] = newParams['title']
+if newParams['status'] is not None:
+    updatedRecord['statis'] = newParams['status']
+```
+We are filtering our tasks here using the `title` tag. We query all the tasks with the title that we input as part of our API call.
+We also expect the new title or status from the API body. We then combine the `filter` and the new information (`updatedRecord`).
+
+```
+newRecord = { "$set": updatedRecord }
+col.update_one(filter, newRecord)
+return {}, 200
+```
+We then use `update_one` which takes in the filter and the `newRecord` which is nothing but our `updatedRecord` tied in with the `"$set"` keyword which tells the database to replace or `set` the updatedRecord in place of the filtered record.
+<i>This updates the first record that matches our filter specs.</i>
+
+### Deleting in MongoDB
+We can delete a record using the `filter` that we have used for GetByID and UPDATE methods above.
+
+```
+filter = {"title": title}
+col.delete_one(filter)
+return {}, 200
+```
+We use `delete_one` to delete the <i>first instance</i> of the filtered records.
