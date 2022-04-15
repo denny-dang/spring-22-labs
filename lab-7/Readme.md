@@ -52,12 +52,15 @@ We first create `record` object using our parameters we got from our JSON body a
 
 ### Querying from MongoDB
 <ol>
-<li> Query all records 
+<li> Query all records</li>
 To query all records, we use `col.find({})` where `col` is our collection
+
 ```
 tasks = col.find({})
 ```
+
 We then use an iterator to convert this reponse into a list of object that is suitable and readable for return.
+
 ```
 output = list()
 for task in tasks:
@@ -66,9 +69,8 @@ for task in tasks:
     "status": task["status"]})
 return {"result": output}, 200
 ```
-</li>
-<li> Query filtered records 
-To query a record based on a certain parameter or condition, we can directly embed our condition into the `find()`
+<li> Query filtered records</li>
+To query a record based on a certain parameter or condition, we can directly embed our condition into the `find()`.
 
 ```
 task = col.find_one({"title": title})
