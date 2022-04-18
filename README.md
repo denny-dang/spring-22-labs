@@ -51,3 +51,10 @@ Topics we covered:
     1. Why do we need Async Queues?
     2. What is under the hood? (High level brief)
     3. Creating a Flask application that uses a Queue and runs it using Docker
+
+## Lab 7 - Basics of NoSQL Databases
+
+Topics we covered:
+    1. Setting up a MongoDB cloud cluster on Atlas
+    2. Connecting to the cloud cluster using the webapp
+    3. Interacting with a NoSQL database using our webserver
